@@ -38,3 +38,15 @@ add_subdirectory(zstd)
 if(NOT DEFINED GORGONZOLA_ENABLE_CPPJIEBA OR GORGONZOLA_ENABLE_CPPJIEBA)
     add_subdirectory(cppjieba)
 endif()
+
+# Support for OpenMP in Vector Indexing
+find_package(OpenMP REQUIRED)
+
+# simdjson integration
+add_library(gorgonzola_simdjson STATIC simdjson.cpp)
+target_include_directories(gorgonzola_simdjson PUBLIC .)
+target_compile_features(gorgonzola_simdjson PUBLIC cxx_std_17)
+
+# Export variables to main build tree
+set(SIMDJSON_LIBRARIES gorgonzola_simdjson PARENT_SCOPE)
+set(HNSWLIB_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/hnswlib PARENT_SCOPE)

@@ -44,7 +44,7 @@
 namespace gorgonzola {
 namespace regex {
 
-static const bool ExtraDebug = false;
+static const bool NfaExtraDebug = false;
 
 class NFA {
 public:
@@ -223,7 +223,7 @@ void NFA::AddToThreadq(
         if (id == 0)
             continue;
         if (q->has_index(id)) {
-            if (ExtraDebug)
+            if (NfaExtraDebug)
                 fprintf(stderr, "  [%d%s]\n", id, FormatCapture(t0->capture).c_str());
             continue;
         }
@@ -286,7 +286,7 @@ void NFA::AddToThreadq(
             // Save state; will pick up at next byte.
             t = Incref(t0);
             *tp = t;
-            if (ExtraDebug)
+            if (NfaExtraDebug)
                 fprintf(stderr, " + %d%s\n", id, FormatCapture(t0->capture).c_str());
 
             if (ip->hint() == 0)
@@ -298,7 +298,7 @@ void NFA::AddToThreadq(
             // Save state; will pick up at next byte.
             t = Incref(t0);
             *tp = t;
-            if (ExtraDebug)
+            if (NfaExtraDebug)
                 fprintf(stderr, " ! %d%s\n", id, FormatCapture(t0->capture).c_str());
 
         Next:
@@ -490,7 +490,7 @@ bool NFA::Search(const StringPiece& text, const StringPiece& const_context, bool
     // For convenience.
     etext_ = text.data() + text.size();
 
-    if (ExtraDebug)
+    if (NfaExtraDebug)
         fprintf(stderr, "NFA::Search %s (context: %s) anchored=%d longest=%d\n",
             std::string(text).c_str(), std::string(context).c_str(), anchored, longest);
 
@@ -502,7 +502,7 @@ bool NFA::Search(const StringPiece& text, const StringPiece& const_context, bool
 
     // Loop over the text, stepping the machine.
     for (const char* p = text.data();; p++) {
-        if (ExtraDebug) {
+        if (NfaExtraDebug) {
             int c = 0;
             if (p == btext_)
                 c = '^';
@@ -583,7 +583,7 @@ bool NFA::Search(const StringPiece& text, const StringPiece& const_context, bool
 
         // If all the threads have died, stop early.
         if (runq->size() == 0) {
-            if (ExtraDebug)
+            if (NfaExtraDebug)
                 fprintf(stderr, "dead\n");
             break;
         }
@@ -610,7 +610,7 @@ bool NFA::Search(const StringPiece& text, const StringPiece& const_context, bool
         for (int i = 0; i < nsubmatch; i++)
             submatch[i] =
                 StringPiece(match_[2 * i], static_cast<size_t>(match_[2 * i + 1] - match_[2 * i]));
-        if (ExtraDebug)
+        if (NfaExtraDebug)
             fprintf(stderr, "match (%td,%td)\n", match_[0] - btext_, match_[1] - btext_);
         return true;
     }
@@ -619,7 +619,7 @@ bool NFA::Search(const StringPiece& text, const StringPiece& const_context, bool
 
 bool Prog::SearchNFA(const StringPiece& text, const StringPiece& context, Anchor anchor,
     MatchKind kind, StringPiece* match, int nmatch) {
-    if (ExtraDebug)
+    if (NfaExtraDebug)
         Dump();
 
     NFA nfa(this);
